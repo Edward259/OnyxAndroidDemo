@@ -1,9 +1,9 @@
 package com.onyx.android.eink.pen.demo.event;
 
-public class FloatMenuStateChangeEvent {
+public class DemoFloatMenuStateChangeEvent {
     public boolean active;
 
-    public FloatMenuStateChangeEvent(boolean active) {
+    public DemoFloatMenuStateChangeEvent(boolean active) {
         this.active = active;
     }
 }

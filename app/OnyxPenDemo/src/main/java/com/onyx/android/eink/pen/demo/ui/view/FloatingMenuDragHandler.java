@@ -8,7 +8,7 @@ import android.view.View;
 
 import com.onyx.android.eink.pen.demo.PenBundle;
 import com.onyx.android.eink.pen.demo.event.ApplyFastModeEvent;
-import com.onyx.android.eink.pen.demo.event.FloatMenuStateChangeEvent;
+import com.onyx.android.eink.pen.demo.event.DemoFloatMenuStateChangeEvent;
 import com.onyx.android.sdk.data.note.TouchPoint;
 import com.onyx.android.sdk.utils.EventBusUtils;
 import com.onyx.android.sdk.utils.ViewUtils;
@@ -95,7 +95,7 @@ public class FloatingMenuDragHandler implements View.OnTouchListener {
                 getPenBundle().setExcludeRectList(excludeRectList);
 
                 EventBusUtils.safelyPostEvent(getEventBus(), new ApplyFastModeEvent(false));
-                EventBusUtils.safelyPostEvent(getEventBus(), new FloatMenuStateChangeEvent(false));
+                EventBusUtils.safelyPostEvent(getEventBus(), new DemoFloatMenuStateChangeEvent(false));
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (SystemClock.elapsedRealtime() - downTime <= LONG_PRESS_THRESHOLD) {
@@ -103,7 +103,7 @@ public class FloatingMenuDragHandler implements View.OnTouchListener {
                 }
                 if (!isLongPressed) {
                     isLongPressed = true;
-                    EventBusUtils.safelyPostEvent(getEventBus(), new FloatMenuStateChangeEvent(true));
+                    EventBusUtils.safelyPostEvent(getEventBus(), new DemoFloatMenuStateChangeEvent(true));
                     EventBusUtils.safelyPostEvent(getEventBus(), new ApplyFastModeEvent(true));
                 }
                 int currentX = (int) event.getRawX();

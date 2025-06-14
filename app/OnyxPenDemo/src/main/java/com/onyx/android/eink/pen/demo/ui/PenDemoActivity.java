@@ -1,6 +1,7 @@
 package com.onyx.android.eink.pen.demo.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -27,7 +28,7 @@ import com.onyx.android.eink.pen.demo.event.ActivityFocusChangedEvent;
 import com.onyx.android.eink.pen.demo.event.ApplyFastModeEvent;
 import com.onyx.android.eink.pen.demo.event.FloatButtonChangedEvent;
 import com.onyx.android.eink.pen.demo.event.FloatButtonMenuStateChangedEvent;
-import com.onyx.android.eink.pen.demo.event.FloatMenuStateChangeEvent;
+import com.onyx.android.eink.pen.demo.event.DemoFloatMenuStateChangeEvent;
 import com.onyx.android.eink.pen.demo.event.NotificationPanelChangeEvent;
 import com.onyx.android.eink.pen.demo.event.PenEvent;
 import com.onyx.android.eink.pen.demo.event.PopupWindowChangeEvent;
@@ -55,6 +56,7 @@ import com.onyx.android.sdk.rx.ObservableHolder;
 import com.onyx.android.sdk.rx.RxCallback;
 import com.onyx.android.sdk.rx.RxFilter;
 import com.onyx.android.sdk.rx.RxManager;
+import com.onyx.android.sdk.utils.BroadcastHelper;
 import com.onyx.android.sdk.utils.EventBusUtils;
 import com.onyx.android.sdk.utils.SystemPropertiesUtil;
 import com.onyx.android.sdk.utils.ViewUtils;
@@ -67,6 +69,9 @@ import java.util.concurrent.TimeUnit;
 
 public class PenDemoActivity extends Activity {
     private static final String TAG = PenDemoActivity.class.getSimpleName();
+    private static final String ONYX_ACTION_REQUIRE_FLOAT_BUTTON_STATUS = "onyx.action.REQUIRE_FLOAT_BUTTON_STATUS";
+    private static final String ARGS_STATUS = "args_status";
+
     private ActivityPenDemoBinding binding;
 
     private final GlobalDeviceReceiver deviceReceiver = new GlobalDeviceReceiver();
@@ -79,7 +84,7 @@ public class PenDemoActivity extends Activity {
     private boolean statusBarShowing;
     private boolean NotificationPanelShowing;
     private boolean floatButtonActivated;
-    private boolean floatMenuActivated;
+    private boolean demoFloatMenuActivated;
     private boolean hasFocus = true;
 
     private final View.OnClickListener brushButtonClickListener = this::onBrushButtonClickImpl;
@@ -91,9 +96,16 @@ public class PenDemoActivity extends Activity {
 
         EpdController.enablePost(binding.getRoot(), 1);
         deviceReceiver.enable(this, true);
+        setNeedReceiveFloatButtonTouchStatus(true);
         EventBusUtils.ensureRegister(getPenManager().getEventBus(), this);
         initView();
         initListener();
+    }
+
+    private void setNeedReceiveFloatButtonTouchStatus(boolean enable) {
+        Intent intent = new Intent(ONYX_ACTION_REQUIRE_FLOAT_BUTTON_STATUS);
+        intent.putExtra(ARGS_STATUS, enable);
+        BroadcastHelper.sendBroadcast(this, intent);
     }
 
     @NotNull
@@ -113,6 +125,7 @@ public class PenDemoActivity extends Activity {
         getPenManager().destroy();
         surfaceChangedFilter.dispose();
         deviceReceiver.enable(this, false);
+        setNeedReceiveFloatButtonTouchStatus(false);
         EventBusUtils.ensureUnregister(getPenManager().getEventBus(), this);
     }
 
@@ -323,6 +336,10 @@ public class PenDemoActivity extends Activity {
                         onRawErasingTouchPointListReceived(touchPointList);
                         return;
                     }
+                    if (floatButtonActivated || demoFloatMenuActivated) {
+                        Log.d(TAG, "FloatButton or demoFloatMenu activated, return");
+                        return;
+                    }
                     Log.d(TAG, "onRawDrawingTouchPointListReceived");
                     addShape(touchPointList);
                 }
@@ -455,13 +472,13 @@ public class PenDemoActivity extends Activity {
                 && !statusBarShowing
                 && !NotificationPanelShowing
                 && !floatButtonActivated
-                && !floatMenuActivated;
+                && !demoFloatMenuActivated;
         final boolean input = resumeInput
                 && hasFocus
                 && !statusBarShowing
                 && !NotificationPanelShowing
                 && !floatButtonActivated
-                && !floatMenuActivated;
+                && !demoFloatMenuActivated;
         if (!render && !input) {
             return;
         }
@@ -519,8 +536,8 @@ public class PenDemoActivity extends Activity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFloatMenuStateChangeEvent(FloatMenuStateChangeEvent event) {
-        floatMenuActivated = event.active;
+    public void onDemoFloatMenuStateChangeEvent(DemoFloatMenuStateChangeEvent event) {
+        demoFloatMenuActivated = event.active;
         refreshScreen();
     }
 
