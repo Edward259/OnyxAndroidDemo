@@ -1,5 +1,7 @@
 package com.onyx.android.eink.pen.demo.request;
 
+import android.graphics.Color;
+
 import androidx.annotation.NonNull;
 
 import com.onyx.android.eink.pen.demo.PenManager;
@@ -15,6 +17,7 @@ public class StrokesEraseFinishedRequest extends BaseRequest {
     public void execute(PenManager penManager) throws Exception {
         penManager.activeRenderMode(InteractiveMode.SCRIBBLE);
         penManager.getRenderContext().eraseArgs = null;
+        penManager.getRenderContext().bitmap.eraseColor(Color.WHITE);
         penManager.renderToBitmap(penManager.getDrawShape());
     }
 }

@@ -25,12 +25,13 @@ import com.onyx.android.eink.pen.demo.scribble.util.TouchUtils;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.data.note.TouchPoint;
 import com.onyx.android.sdk.pen.EpdPenManager;
-import com.onyx.android.sdk.pen.NeoFountainPen;
+import com.onyx.android.sdk.pen.NeoPenConfig;
+import com.onyx.android.sdk.pen.NeoPenUtils;
+import com.onyx.android.sdk.pen.PenUtils;
 import com.onyx.android.sdk.pen.RawInputCallback;
 import com.onyx.android.sdk.pen.TouchHelper;
 import com.onyx.android.sdk.pen.data.TouchPointList;
 import com.onyx.android.sdk.rx.RxManager;
-import com.onyx.android.sdk.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -353,7 +354,9 @@ public class ScribbleFingerTouchDemoActivity extends AppCompatActivity {
 
         if (binding.rbMarker.isChecked()) {
             float maxPressure = EpdController.getMaxTouchPressure();
-            NeoFountainPen.drawStroke(canvas, paint, list, NumberUtils.FLOAT_ONE, STROKE_WIDTH, maxPressure, false);
+            List<TouchPoint> markerPoints = NeoPenUtils.computeStrokePoints(
+                    NeoPenConfig.NEOPEN_PEN_TYPE_MARKER, list, STROKE_WIDTH, maxPressure);
+            PenUtils.drawStrokeByPointSize(canvas, paint, markerPoints, false);
         }
 
         if (binding.rbPencil.isChecked()) {

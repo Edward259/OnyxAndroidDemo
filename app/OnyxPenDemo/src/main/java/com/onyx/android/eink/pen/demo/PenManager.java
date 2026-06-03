@@ -19,6 +19,7 @@ import com.onyx.android.sdk.pen.TouchHelper;
 import com.onyx.android.sdk.rx.RxScheduler;
 import com.onyx.android.sdk.utils.BitmapUtils;
 import com.onyx.android.sdk.utils.Debug;
+import com.onyx.android.sdk.utils.ResManager;
 import com.onyx.android.sdk.utils.ViewUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -185,7 +186,15 @@ public class PenManager {
         if (getTouchHelper() == null) {
             return;
         }
-        getTouchHelper().setStrokeWidth(penWidth);
+        // Convert mm to px for TouchHelper
+        float penWidthPx = mmToPx(penWidth);
+        getTouchHelper().setStrokeWidth(penWidthPx);
+    }
+
+    private static final float MM_OF_ONE_INCH = 25.4f;
+
+    private float mmToPx(float mm) {
+        return mm * ResManager.getAppContext().getResources().getDisplayMetrics().densityDpi / MM_OF_ONE_INCH;
     }
 
     @WorkerThread

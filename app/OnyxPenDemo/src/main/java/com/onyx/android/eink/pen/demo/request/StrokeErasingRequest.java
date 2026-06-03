@@ -29,6 +29,7 @@ public class StrokeErasingRequest extends BaseRequest {
     public void execute(PenManager penManager) throws Exception {
         penManager.activeRenderMode(InteractiveMode.SCRIBBLE_ERASE);
         penManager.getRenderContext().eraseArgs = eraseArgs;
+        removedShapeList.clear();
         removeShapesByTouchPointList(eraseArgs.eraseTrackPoints, eraseArgs.drawRadius);
         penManager.renderToBitmap(removedShapeList);
     }
@@ -49,7 +50,7 @@ public class StrokeErasingRequest extends BaseRequest {
                 continue;
             }
             RectF shapeRect = new RectF(shape.getBoundingRect());
-            RectUtils.expand(shapeRect, shape.getStrokeWidth() / 2f);
+            RectUtils.expand(shapeRect, shape.getRenderStrokeWidth() / 2f);
             if (RectUtils.intersects(eraseRect, shapeRect)) {
                 hitShapes.add(shape);
             }
