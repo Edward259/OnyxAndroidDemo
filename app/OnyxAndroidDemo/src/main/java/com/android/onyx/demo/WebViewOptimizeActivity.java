@@ -8,8 +8,7 @@ import android.webkit.WebViewClient;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityWebviewOptimizeBinding;
+import com.android.onyx.demo.databinding.ActivityWebviewOptimizeBinding;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 
 

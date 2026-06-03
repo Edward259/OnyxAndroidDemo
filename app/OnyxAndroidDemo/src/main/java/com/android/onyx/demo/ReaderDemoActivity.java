@@ -16,8 +16,7 @@ import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityReaderDemoBinding;
+import com.android.onyx.demo.databinding.ActivityReaderDemoBinding;
 import com.onyx.android.sdk.utils.FileUtils;
 import com.onyx.android.sdk.utils.StringUtils;
 

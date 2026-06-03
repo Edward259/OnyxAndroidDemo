@@ -7,8 +7,7 @@ import android.widget.RadioGroup;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityRefreshModeDemoBinding;
+import com.android.onyx.demo.databinding.ActivityRefreshModeDemoBinding;
 import com.onyx.android.sdk.api.device.epd.UpdateOption;
 import com.onyx.android.sdk.device.Device;
 

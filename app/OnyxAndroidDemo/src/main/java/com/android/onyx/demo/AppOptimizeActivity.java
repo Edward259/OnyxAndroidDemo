@@ -11,9 +11,8 @@ import android.widget.EditText;
 
 import androidx.databinding.DataBindingUtil;
 
+import com.android.onyx.demo.databinding.ActivityAppOptimizeBinding;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityAppOptimizeBinding;
 
 /**
  * Created by Administrator on 2018/3/26 17:35.

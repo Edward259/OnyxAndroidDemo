@@ -14,8 +14,7 @@ import android.widget.TextView;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityDictqueryBinding;
+import com.android.onyx.demo.databinding.ActivityDictqueryBinding;
 import com.onyx.android.sdk.data.DictionaryQuery;
 import com.onyx.android.sdk.utils.DictionaryUtil;
 

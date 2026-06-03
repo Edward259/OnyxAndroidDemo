@@ -9,8 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableBoolean;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityScreenSaverBinding;
+import com.android.onyx.demo.databinding.ActivityScreenSaverBinding;
 import com.onyx.android.sdk.api.device.screensaver.ScreenResourceManager;
 
 

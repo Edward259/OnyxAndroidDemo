@@ -11,8 +11,7 @@ import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityOpenKcbBinding;
+import com.android.onyx.demo.databinding.ActivityOpenKcbBinding;
 import com.onyx.android.sdk.utils.JSONUtils;
 import com.onyx.android.sdk.utils.StringUtils;
 

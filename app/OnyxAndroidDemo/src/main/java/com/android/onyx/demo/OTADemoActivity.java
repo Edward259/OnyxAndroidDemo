@@ -9,8 +9,7 @@ import android.widget.EditText;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityOtaDemoBinding;
+import com.android.onyx.demo.databinding.ActivityOtaDemoBinding;
 import com.onyx.android.sdk.api.data.model.FirmwareBean;
 import com.onyx.android.sdk.api.device.OTAManager;
 import com.onyx.android.sdk.rx.RxUtils;

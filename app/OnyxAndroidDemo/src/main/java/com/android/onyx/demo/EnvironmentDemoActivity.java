@@ -7,8 +7,7 @@ import android.widget.TextView;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityEnvironmentDemoBinding;
+import com.android.onyx.demo.databinding.ActivityEnvironmentDemoBinding;
 import com.onyx.android.sdk.api.device.DeviceEnvironment;
 
 public class EnvironmentDemoActivity extends AppCompatActivity {

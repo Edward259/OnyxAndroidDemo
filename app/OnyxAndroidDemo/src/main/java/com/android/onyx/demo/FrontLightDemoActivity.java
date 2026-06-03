@@ -5,10 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 
 import androidx.databinding.DataBindingUtil;
 
+import com.android.onyx.demo.databinding.ActivityFrontLightDemoBinding;
 import com.android.onyx.demo.factory.FrontLightFactory;
 import com.android.onyx.demo.model.BaseLightModel;
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityFrontLightDemoBinding;
 
 
 public class FrontLightDemoActivity extends AppCompatActivity {

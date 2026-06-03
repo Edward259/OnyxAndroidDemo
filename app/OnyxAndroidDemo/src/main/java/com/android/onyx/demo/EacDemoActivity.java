@@ -8,8 +8,7 @@ import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityEacDemoBinding;
+import com.android.onyx.demo.databinding.ActivityEacDemoBinding;
 import com.onyx.android.sdk.api.device.eac.SimpleEACManage;
 import com.onyx.android.sdk.rx.RxUtils;
 import com.onyx.android.sdk.utils.DeviceUtils;

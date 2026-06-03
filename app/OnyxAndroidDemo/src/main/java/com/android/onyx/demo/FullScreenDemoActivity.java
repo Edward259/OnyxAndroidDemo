@@ -6,8 +6,7 @@ import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityFullScreenDemoBinding;
+import com.android.onyx.demo.databinding.ActivityFullScreenDemoBinding;
 import com.onyx.android.sdk.utils.DeviceUtils;
 
 
