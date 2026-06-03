@@ -1,8 +1,7 @@
 package com.android.onyx.demo;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.RadioGroup;
 
 import androidx.databinding.DataBindingUtil;
@@ -10,6 +9,8 @@ import androidx.databinding.DataBindingUtil;
 import com.android.onyx.demo.databinding.ActivityRefreshModeDemoBinding;
 import com.onyx.android.sdk.api.device.epd.UpdateOption;
 import com.onyx.android.sdk.device.Device;
+
+import org.jetbrains.annotations.Nullable;
 
 
 public class RefreshModeDemoActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener {
