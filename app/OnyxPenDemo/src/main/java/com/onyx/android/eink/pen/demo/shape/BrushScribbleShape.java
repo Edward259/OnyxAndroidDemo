@@ -61,8 +61,11 @@ public class BrushScribbleShape extends Shape {
             return false;
         }
         NeoPenRender penRender = new NeoPenRender(pen);
-        penRender.render(renderContext.canvas, renderContext.paint, renderPoints);
-        penRender.destroyPen();
+        try {
+            penRender.render(renderContext.canvas, renderContext.paint, renderPoints);
+        } finally {
+            penRender.destroyPen();
+        }
         return true;
     }
 
