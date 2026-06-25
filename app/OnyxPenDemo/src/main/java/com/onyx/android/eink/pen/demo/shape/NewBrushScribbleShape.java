@@ -22,25 +22,8 @@ public class NewBrushScribbleShape extends Shape {
         if (neoBrushPoints == null || neoBrushPoints.size() < 2) {
             return;
         }
-        if (isTransparent()) {
-            PenUtils.drawStrokeByPointSize(renderContext.canvas, renderContext.paint,
-                    neoBrushPoints, true);
-            PenUtils.drawStrokeByPointSize(renderContext.canvas, renderContext.paint,
-                    expandSizes(neoBrushPoints, 2.0f), true);
-        } else {
-            PenUtils.drawStrokeByPointSize(renderContext.canvas, renderContext.paint,
-                    neoBrushPoints, false);
-        }
-    }
-
-    private static List<TouchPoint> expandSizes(List<TouchPoint> points, float extra) {
-        List<TouchPoint> out = new ArrayList<>(points.size());
-        for (TouchPoint p : points) {
-            TouchPoint c = new TouchPoint(p);
-            c.size = p.size + extra;
-            out.add(c);
-        }
-        return out;
+        PenUtils.drawStrokeByPointSize(renderContext.canvas, renderContext.paint,
+                neoBrushPoints, isTransparent());
     }
 
     private List<TouchPoint> computeNeoBrushPoints() {

@@ -8,7 +8,6 @@ import com.onyx.android.sdk.data.note.TouchPoint;
 import com.onyx.android.sdk.pen.NeoFountainPenWrapper;
 import com.onyx.android.sdk.pen.NeoPen;
 import com.onyx.android.sdk.pen.NeoPenRender;
-import com.onyx.android.sdk.pen.PenUtils;
 import com.onyx.android.sdk.pen.utils.FountainShapes;
 
 import java.util.ArrayList;
@@ -24,41 +23,26 @@ public class BrushScribbleShape extends Shape {
             return;
         }
         applyFountainPaintStyle(renderContext);
-        if (renderFountainV2(renderContext, points)) {
-            if (isTransparent()) {
-                renderFountainV2(renderContext, points, getRenderStrokeWidth() + 2.0f);
-            }
-            return;
-        }
-        List<TouchPoint> fountainPoints = NeoFountainPenWrapper.computeStrokePoints(copyAndNormalizePressure(points),
-                1.0f, getRenderStrokeWidth(), 1.0f);
-        PenUtils.drawStrokeByPointSize(renderContext.canvas, renderContext.paint, fountainPoints, isTransparent());
-        if (isTransparent()) {
-            PenUtils.drawStrokeByPointSize(renderContext.canvas, renderContext.paint,
-                    expandSizes(fountainPoints, 2.0f), true);
-        }
+        renderFountainV2(renderContext, copyAndNormalizePressure(points));
     }
 
     private void applyFountainPaintStyle(RendererHelper.RenderContext renderContext) {
+        // Fountain pen results are closed paths; use FILL for both draw and erase so
+        // CLEAR covers the same footprint as the original stroke.
         renderContext.paint.setStyle(Paint.Style.FILL);
         renderContext.paint.setStrokeWidth(0.0f);
     }
 
-    private boolean renderFountainV2(RendererHelper.RenderContext renderContext, List<TouchPoint> points) {
-        return renderFountainV2(renderContext, points, getRenderStrokeWidth());
-    }
-
-    private boolean renderFountainV2(RendererHelper.RenderContext renderContext,
-                                      List<TouchPoint> points, float strokeWidth) {
-        List<TouchPoint> renderPoints = copyAndNormalizePressure(points);
-        if (renderPoints.size() < 2 || !NeoFountainPenWrapper.hasPressure(renderPoints)) {
-            return false;
+    private void renderFountainV2(RendererHelper.RenderContext renderContext,
+                                  List<TouchPoint> renderPoints) {
+        if (renderPoints.size() < 2) {
+            return;
         }
-        NeoPen pen = FountainShapes.INSTANCE.createNeoPenV2(strokeWidth,
+        NeoPen pen = FountainShapes.INSTANCE.createNeoPenV2(getRenderStrokeWidth(),
                 NeoFountainPenWrapper.MIN_FOUNTAIN_PEN_WIDTH,
                 1.0f, 1.0f, 1.0f, 1.0f, null, true, null);
         if (pen == null) {
-            return false;
+            return;
         }
         NeoPenRender penRender = new NeoPenRender(pen);
         try {
@@ -66,17 +50,6 @@ public class BrushScribbleShape extends Shape {
         } finally {
             penRender.destroyPen();
         }
-        return true;
-    }
-
-    private static List<TouchPoint> expandSizes(List<TouchPoint> points, float extra) {
-        List<TouchPoint> out = new ArrayList<>(points.size());
-        for (TouchPoint p : points) {
-            TouchPoint c = new TouchPoint(p);
-            c.size = p.size + extra;
-            out.add(c);
-        }
-        return out;
     }
 
     private List<TouchPoint> copyAndNormalizePressure(List<TouchPoint> points) {
