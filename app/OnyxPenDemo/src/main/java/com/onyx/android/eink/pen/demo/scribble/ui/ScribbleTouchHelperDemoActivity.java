@@ -8,7 +8,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -25,12 +25,11 @@ import com.onyx.android.eink.pen.demo.scribble.request.RendererToScreenRequest;
 import com.onyx.android.eink.pen.demo.scribble.util.TouchUtils;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.data.note.TouchPoint;
-import com.onyx.android.sdk.pen.NeoFountainPen;
+import com.onyx.android.sdk.pen.NeoBrushPenWrapper;
 import com.onyx.android.sdk.pen.RawInputCallback;
 import com.onyx.android.sdk.pen.TouchHelper;
 import com.onyx.android.sdk.pen.data.TouchPointList;
 import com.onyx.android.sdk.rx.RxManager;
-import com.onyx.android.sdk.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -337,7 +336,7 @@ public class ScribbleTouchHelperDemoActivity extends AppCompatActivity {
 
         if (binding.rbBrush.isChecked()) {
             float maxPressure = EpdController.getMaxTouchPressure();
-            NeoFountainPen.drawStroke(canvas, paint, list, NumberUtils.FLOAT_ONE, STROKE_WIDTH, maxPressure, false);
+            NeoBrushPenWrapper.drawStroke(canvas, paint, list, STROKE_WIDTH, maxPressure, false);
         }
 
         if (binding.rbPencil.isChecked()) {

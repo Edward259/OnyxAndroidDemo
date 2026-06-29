@@ -12,8 +12,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -30,13 +30,12 @@ import com.onyx.android.eink.pen.demo.scribble.request.PartialRefreshRequest;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.data.PenConstant;
 import com.onyx.android.sdk.data.note.TouchPoint;
-import com.onyx.android.sdk.pen.NeoFountainPen;
+import com.onyx.android.sdk.pen.NeoBrushPenWrapper;
 import com.onyx.android.sdk.pen.RawInputCallback;
 import com.onyx.android.sdk.pen.TouchHelper;
 import com.onyx.android.sdk.pen.data.TouchPointList;
 import com.onyx.android.sdk.rx.RxCallback;
 import com.onyx.android.sdk.rx.RxManager;
-import com.onyx.android.sdk.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,7 +197,7 @@ public class ScribblePenUpRefreshDemoActivity extends AppCompatActivity {
         switch (binding.rgStrokeStyle.getCheckedRadioButtonId()) {
             case R.id.rb_brush:
                 float maxPressure = EpdController.getMaxTouchPressure();
-                NeoFountainPen.drawStroke(canvas, paint, list, NumberUtils.FLOAT_ONE, STROKE_WIDTH, maxPressure, false);
+                NeoBrushPenWrapper.drawStroke(canvas, paint, list, STROKE_WIDTH, maxPressure, false);
                 break;
             default:
                 Path path = new Path();

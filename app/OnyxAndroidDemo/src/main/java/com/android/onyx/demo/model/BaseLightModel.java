@@ -7,7 +7,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.SeekBar;
 
-import com.onyx.android.demo.databinding.ActivityFrontLightDemoBinding;
+import com.android.onyx.demo.databinding.ActivityFrontLightDemoBinding;
 import com.onyx.android.sdk.api.device.brightness.BaseBrightnessProvider;
 import com.onyx.android.sdk.utils.RxTimerUtil;
 

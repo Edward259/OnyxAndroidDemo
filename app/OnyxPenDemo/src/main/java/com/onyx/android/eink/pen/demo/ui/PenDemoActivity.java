@@ -122,6 +122,10 @@ public class PenDemoActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        destroyImpl();
+    }
+
+    private void destroyImpl() {
         getPenManager().destroy();
         surfaceChangedFilter.dispose();
         deviceReceiver.enable(this, false);

@@ -3,15 +3,14 @@ package com.android.onyx.demo;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityOpenSettingBinding;
+import com.android.onyx.demo.databinding.ActivityOpenSettingBinding;
 
 
 public class OpenSettingActivity extends AppCompatActivity {

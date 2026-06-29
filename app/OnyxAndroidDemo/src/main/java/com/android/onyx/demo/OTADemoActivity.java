@@ -1,16 +1,15 @@
 package com.android.onyx.demo;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityOtaDemoBinding;
+import com.android.onyx.demo.databinding.ActivityOtaDemoBinding;
 import com.onyx.android.sdk.api.data.model.FirmwareBean;
 import com.onyx.android.sdk.api.device.OTAManager;
 import com.onyx.android.sdk.rx.RxUtils;

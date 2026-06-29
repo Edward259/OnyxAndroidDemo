@@ -10,10 +10,15 @@ import com.onyx.android.eink.pen.demo.helper.RendererHelper;
 import com.onyx.android.sdk.data.note.TouchPoint;
 import com.onyx.android.sdk.pen.PenUtils;
 import com.onyx.android.sdk.pen.data.TouchPointList;
+import com.onyx.android.sdk.utils.ResManager;
 
 import java.util.List;
 
 public class Shape {
+    // 1 inch = 25.4 mm (SI unit definition). Used in mmToPx() to convert
+    // millimetre stroke widths to pixel-based rendering units.
+    private static final float MM_OF_ONE_INCH = 25.4f;
+
     protected int shapeType;
     protected int texture;
     protected int strokeColor;
@@ -126,8 +131,17 @@ public class Shape {
     }
 
     public float getRenderStrokeWidth() {
-        float strokeWidth = getStrokeWidth();
-        return isTransparent() ? (strokeWidth + PenUtils.ERASE_EXTRA_STROKE_WIDTH) : strokeWidth;
+        float renderStrokeWidth = getBaseRenderStrokeWidth();
+        return isTransparent() ? (renderStrokeWidth + PenUtils.ERASE_EXTRA_STROKE_WIDTH) : renderStrokeWidth;
+    }
+
+    protected float getBaseRenderStrokeWidth() {
+        return mmToPx(getStrokeWidth());
+    }
+
+    protected float mmToPx(float mm) {
+        return mm * ResManager.getAppContext().getResources().getDisplayMetrics().densityDpi
+                / MM_OF_ONE_INCH;
     }
 
     public boolean hitTestPoints(TouchPointList pointList, float radius) {

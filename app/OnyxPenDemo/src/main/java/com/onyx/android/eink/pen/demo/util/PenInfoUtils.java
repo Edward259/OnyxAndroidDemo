@@ -10,14 +10,16 @@ public class PenInfoUtils {
 
     public static float getShapeDefaultStrokeWidth(int shapeType) {
         switch (shapeType) {
+            case ShapeFactory.SHAPE_PENCIL_SCRIBBLE:
+                return PenConstant.PENCIL_PEN_DEFAULT_STROKE_WIDTH_MM;
             case ShapeFactory.SHAPE_NEO_BRUSH_SCRIBBLE:
-                return PenConstant.BRUSH_PEN_DEFAULT_STROKE_WIDTH;
+                return PenConstant.BRUSH_PEN_DEFAULT_STROKE_WIDTH_MM;
             case ShapeFactory.SHAPE_MARKER_SCRIBBLE:
-                return PenConstant.MARKER_PEN_DEFAULT_STROKE_WIDTH;
+                return PenConstant.MARKER_PEN_DEFAULT_STROKE_WIDTH_MM;
             case ShapeFactory.SHAPE_CHARCOAL_SCRIBBLE:
-                return PenConstant.CHARCOAL_PEN_DEFAULT_STROKE_WIDTH;
+                return PenConstant.CHARCOAL_PEN_DEFAULT_STROKE_WIDTH_MM;
             default:
-                return PenConstant.DEFAULT_STROKE_WIDTH;
+                return PenConstant.DEFAULT_STROKE_WIDTH_MM;
         }
     }
 

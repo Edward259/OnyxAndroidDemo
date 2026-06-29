@@ -7,7 +7,7 @@ import android.view.View;
 
 import androidx.databinding.ObservableInt;
 
-import com.onyx.android.demo.databinding.ActivityFrontLightDemoBinding;
+import com.android.onyx.demo.databinding.ActivityFrontLightDemoBinding;
 import com.onyx.android.sdk.api.device.brightness.BaseBrightnessProvider;
 import com.onyx.android.sdk.api.device.brightness.BrightnessController;
 import com.onyx.android.sdk.device.BaseDevice;

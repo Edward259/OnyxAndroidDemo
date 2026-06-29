@@ -1,15 +1,14 @@
 package com.android.onyx.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityWebviewOptimizeBinding;
+import com.android.onyx.demo.databinding.ActivityWebviewOptimizeBinding;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 
 

@@ -1,14 +1,13 @@
 package com.android.onyx.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.CompoundButton;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableBoolean;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityBooxSettingBinding;
+import com.android.onyx.demo.databinding.ActivityBooxSettingBinding;
 import com.onyx.android.sdk.api.device.GlobalContrastController;
 import com.onyx.android.sdk.utils.SystemPropertiesUtil;
 

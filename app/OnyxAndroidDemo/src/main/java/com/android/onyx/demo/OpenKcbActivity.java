@@ -3,16 +3,15 @@ package com.android.onyx.demo;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityOpenKcbBinding;
+import com.android.onyx.demo.databinding.ActivityOpenKcbBinding;
 import com.onyx.android.sdk.utils.JSONUtils;
 import com.onyx.android.sdk.utils.StringUtils;
 

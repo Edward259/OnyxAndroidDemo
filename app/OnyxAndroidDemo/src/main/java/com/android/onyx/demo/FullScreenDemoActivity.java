@@ -1,13 +1,12 @@
 package com.android.onyx.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.demo.R;
-import com.onyx.android.demo.databinding.ActivityFullScreenDemoBinding;
+import com.android.onyx.demo.databinding.ActivityFullScreenDemoBinding;
 import com.onyx.android.sdk.utils.DeviceUtils;
 
 
