@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.view.SurfaceView;
 
-import com.onyx.android.eink.pen.demo.util.RendererUtils;
+import com.onyx.android.eink.pen.demo.render.RendererUtils;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.api.device.epd.UpdateMode;
 import com.onyx.android.sdk.rx.RxRequest;

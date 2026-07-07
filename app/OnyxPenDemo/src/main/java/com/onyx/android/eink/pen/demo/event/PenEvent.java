@@ -19,8 +19,16 @@ public class PenEvent {
         this.delayResumePenTimeMs = delayResumePenTimeMs;
     }
 
+    public static PenEvent pauseDrawingRender() {
+        return new PenEvent(false, false, 0);
+    }
+
     public static PenEvent resumeRawDrawing(int delayResumePenTimeMs) {
         return new PenEvent(true, true, delayResumePenTimeMs);
+    }
+
+    public static PenEvent resumeRawDrawingImmediately() {
+        return new PenEvent(true, true, 0);
     }
 
     public boolean isResumeDrawingRender() {

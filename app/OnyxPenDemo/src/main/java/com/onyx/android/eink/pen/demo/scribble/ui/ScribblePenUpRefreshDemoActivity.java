@@ -26,7 +26,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.onyx.android.eink.pen.demo.R;
 import com.onyx.android.eink.pen.demo.databinding.ActivityPenUpRefreshDemoBinding;
-import com.onyx.android.eink.pen.demo.scribble.request.PartialRefreshRequest;
+import com.onyx.android.eink.pen.demo.request.PartialRefreshRequest;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.data.PenConstant;
 import com.onyx.android.sdk.data.note.TouchPoint;
@@ -168,8 +168,7 @@ public class ScribblePenUpRefreshDemoActivity extends AppCompatActivity {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                         return;
                     }
-                    getRxManager().enqueue(new PartialRefreshRequest(ScribblePenUpRefreshDemoActivity.this, binding.surfaceview1, refreshRect)
-                                    .setBitmap(bitmap),
+                    getRxManager().enqueue(new PartialRefreshRequest(binding.surfaceview1, refreshRect, bitmap),
                             new RxCallback<PartialRefreshRequest>() {
                                 @Override
                                 public void onNext(@NonNull PartialRefreshRequest partialRefreshRequest) {

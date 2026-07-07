@@ -45,7 +45,6 @@ The SDK also provides additional functionality such as a move eraser, inking on 
 
 * [ScribbleMultipleScribbleViewActivity](app/src/main/java/com/android/onyx/demo/scribble/ScribbleMultipleScribbleViewActivity.java): inking with multiple views
 
-
 ## 4. Screensaver
 
 * [ScreensaverActivity](app/src/main/java/com/android/onyx/demo/ScreensaverActivity.java): setting a screensaver
@@ -64,6 +63,12 @@ The SDK also provides additional functionality such as a move eraser, inking on 
 ## 8. Eink Develop Guide
 
 * [EinkDevelopGuide](doc/Eink-Develop-Guide.md): Eink Develop Guide documentation
+
+## 9. OnyxPenDemo
+
+Standalone handwriting demo module (`app/OnyxPenDemo`) built around `PenSession`.
+
+* [PenDemoActivity Build Guide](doc/PenDemoActivity-Build-Guide.md): integrate handwriting in your Activity (`PenSession`)
 
 ## PRs Welcome
 

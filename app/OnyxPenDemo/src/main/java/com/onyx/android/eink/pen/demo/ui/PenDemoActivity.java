@@ -1,63 +1,26 @@
 package com.onyx.android.eink.pen.demo.ui;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.PixelFormat;
-import android.graphics.RectF;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 
-import com.onyx.android.eink.pen.demo.PenBundle;
-import com.onyx.android.eink.pen.demo.PenManager;
+import com.onyx.android.eink.pen.demo.core.PenManager;
+import com.onyx.android.eink.pen.demo.core.PenTool;
+import com.onyx.android.eink.pen.demo.core.PenSession;
 import com.onyx.android.eink.pen.demo.R;
-import com.onyx.android.eink.pen.demo.action.CommonPenAction;
-import com.onyx.android.eink.pen.demo.action.RefreshScreenAction;
-import com.onyx.android.eink.pen.demo.bean.EraseArgs;
-import com.onyx.android.eink.pen.demo.data.ShapeFactory;
 import com.onyx.android.eink.pen.demo.databinding.ActivityPenDemoBinding;
-import com.onyx.android.eink.pen.demo.event.ActivityFocusChangedEvent;
+import com.onyx.android.eink.pen.demo.erase.ui.EraseSettingPop;
 import com.onyx.android.eink.pen.demo.event.ApplyFastModeEvent;
-import com.onyx.android.eink.pen.demo.event.FloatButtonChangedEvent;
-import com.onyx.android.eink.pen.demo.event.FloatButtonMenuStateChangedEvent;
-import com.onyx.android.eink.pen.demo.event.DemoFloatMenuStateChangeEvent;
-import com.onyx.android.eink.pen.demo.event.NotificationPanelChangeEvent;
-import com.onyx.android.eink.pen.demo.event.PenEvent;
-import com.onyx.android.eink.pen.demo.event.PopupWindowChangeEvent;
-import com.onyx.android.eink.pen.demo.event.StatusBarChangeEvent;
-import com.onyx.android.eink.pen.demo.receiver.GlobalDeviceReceiver;
-import com.onyx.android.eink.pen.demo.request.AddShapeRequest;
-import com.onyx.android.eink.pen.demo.request.AttachNoteViewRequest;
-import com.onyx.android.eink.pen.demo.request.BaseRequest;
-import com.onyx.android.eink.pen.demo.request.PartialRefreshRequest;
-import com.onyx.android.eink.pen.demo.request.PauseRawDrawingRenderRequest;
-import com.onyx.android.eink.pen.demo.request.PauseRawInputRenderRequest;
-import com.onyx.android.eink.pen.demo.request.ResumeRawDrawingRequest;
-import com.onyx.android.eink.pen.demo.request.StrokeErasingRequest;
-import com.onyx.android.eink.pen.demo.request.StrokesEraseFinishedRequest;
-import com.onyx.android.eink.pen.demo.shape.Shape;
-import com.onyx.android.eink.pen.demo.ui.popup.PenSettingPop;
-import com.onyx.android.eink.pen.demo.ui.view.FloatingMenuDragHandler;
-import com.onyx.android.eink.pen.demo.util.ShapeUtils;
+import com.onyx.android.eink.pen.demo.brush.ui.PenSettingPop;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.api.device.epd.UpdateMode;
-import com.onyx.android.sdk.data.note.TouchPoint;
-import com.onyx.android.sdk.pen.RawInputCallback;
-import com.onyx.android.sdk.pen.data.TouchPointList;
-import com.onyx.android.sdk.rx.ObservableHolder;
-import com.onyx.android.sdk.rx.RxCallback;
-import com.onyx.android.sdk.rx.RxFilter;
-import com.onyx.android.sdk.rx.RxManager;
-import com.onyx.android.sdk.utils.BroadcastHelper;
-import com.onyx.android.sdk.utils.EventBusUtils;
 import com.onyx.android.sdk.utils.SystemPropertiesUtil;
 import com.onyx.android.sdk.utils.ViewUtils;
 
@@ -65,29 +28,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
 public class PenDemoActivity extends Activity {
-    private static final String TAG = PenDemoActivity.class.getSimpleName();
-    private static final String ONYX_ACTION_REQUIRE_FLOAT_BUTTON_STATUS = "onyx.action.REQUIRE_FLOAT_BUTTON_STATUS";
-    private static final String ARGS_STATUS = "args_status";
 
     private ActivityPenDemoBinding binding;
-
-    private final GlobalDeviceReceiver deviceReceiver = new GlobalDeviceReceiver();
-    private RxManager rxManager;
-    private final RxFilter<Boolean> surfaceChangedFilter = new RxFilter<>();
-
-    private RawInputCallback rawInputCallback;
-    private FloatingMenuDragHandler dragHandler;
-
-    private boolean statusBarShowing;
-    private boolean NotificationPanelShowing;
-    private boolean floatButtonActivated;
-    private boolean demoFloatMenuActivated;
-    private boolean hasFocus = true;
+    private PenSession penSession;
 
     private final View.OnClickListener brushButtonClickListener = this::onBrushButtonClickImpl;
+    private final View.OnClickListener eraseButtonClickListener = this::onEraseButtonClickImpl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,17 +42,23 @@ public class PenDemoActivity extends Activity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pen_demo);
 
         EpdController.enablePost(binding.getRoot(), 1);
-        deviceReceiver.enable(this, true);
-        setNeedReceiveFloatButtonTouchStatus(true);
-        EventBusUtils.ensureRegister(getPenManager().getEventBus(), this);
+        penSession = PenSession.create(this);
+        penSession.initialize();
         initView();
         initListener();
+        syncUiFromBundle();
     }
 
-    private void setNeedReceiveFloatButtonTouchStatus(boolean enable) {
-        Intent intent = new Intent(ONYX_ACTION_REQUIRE_FLOAT_BUTTON_STATUS);
-        intent.putExtra(ARGS_STATUS, enable);
-        BroadcastHelper.sendBroadcast(this, intent);
+    @Override
+    protected void onPause() {
+        penSession.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        penSession.onResume();
     }
 
     @NotNull
@@ -116,47 +69,19 @@ public class PenDemoActivity extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        EventBusUtils.safelyPostEvent(getPenBundle().getEventBus(), new ActivityFocusChangedEvent(hasFocus));
+        penSession.onWindowFocusChanged(hasFocus);
     }
 
     @Override
     protected void onDestroy() {
+        penSession.onDestroy();
         super.onDestroy();
-        destroyImpl();
-    }
-
-    private void destroyImpl() {
-        getPenManager().destroy();
-        surfaceChangedFilter.dispose();
-        deviceReceiver.enable(this, false);
-        setNeedReceiveFloatButtonTouchStatus(false);
-        EventBusUtils.ensureUnregister(getPenManager().getEventBus(), this);
     }
 
     private void initView() {
-        initSurfaceView();
         ViewUtils.setViewVisibleOrGone(binding.penUpContainer, !SystemPropertiesUtil.isTablet());
-    }
-
-    private void initSurfaceView() {
-        subscribeSurfaceChanged();
-        final SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                surfaceChangedFilter.onNext(true);
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-            }
-        };
-        SurfaceHolder surfaceHolder = getSurfaceView().getHolder();
-        surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
-        surfaceHolder.addCallback(surfaceCallback);
+        getSurfaceView().getHolder().addCallback(
+                penSession.createSurfaceCallback(getSurfaceView(), getFloatMenuLayout()));
     }
 
     private void initListener() {
@@ -167,102 +92,85 @@ public class PenDemoActivity extends Activity {
             }
         });
         binding.brushButton.setOnClickListener(brushButtonClickListener);
-        binding.brushCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.floatMenuContainer.floatBrushCheck.isChecked() != isChecked) {
-                binding.floatMenuContainer.floatBrushCheck.setChecked(isChecked);
-                return;
-            }
-            onBrushCheckImpl(isChecked);
-        });
-        binding.eraseCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.floatMenuContainer.floatEraseCheck.isChecked() != isChecked) {
-                binding.floatMenuContainer.floatEraseCheck.setChecked(isChecked);
-                return;
-            }
-            onEraseCheckImpl(isChecked);
-        });
-        binding.displayEraseTrackCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.floatMenuContainer.floatDisplayEraseTrackCheck.isChecked() != isChecked) {
-                binding.floatMenuContainer.floatDisplayEraseTrackCheck.setChecked(isChecked);
-                return;
-            }
-            onDisplayEraseTrackCheckImpl(isChecked);
-        });
-        binding.penUpCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.floatMenuContainer.floatPenUpCheck.isChecked() != isChecked) {
-                binding.floatMenuContainer.floatPenUpCheck.setChecked(isChecked);
-                return;
-            }
-            onPenUpCheckImpl(isChecked);
-        });
-        initFloatMenuListener();
-    }
-
-    private void initFloatMenuListener() {
+        binding.eraseButton.setOnClickListener(eraseButtonClickListener);
         binding.floatMenuContainer.floatBrushButton.setOnClickListener(brushButtonClickListener);
-        binding.floatMenuContainer.floatBrushCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.brushCheck.isChecked() != isChecked) {
-                binding.brushCheck.setChecked(isChecked);
+        binding.floatMenuContainer.floatEraseButton.setOnClickListener(eraseButtonClickListener);
+
+        bindDualCheckBox(binding.brushCheck, binding.floatMenuContainer.floatBrushCheck, this::onBrushCheckImpl);
+        bindDualCheckBox(binding.eraseCheck, binding.floatMenuContainer.floatEraseCheck, this::onEraseCheckImpl);
+        bindDualCheckBox(binding.penUpCheck, binding.floatMenuContainer.floatPenUpCheck, this::onPenUpCheckImpl);
+    }
+
+    private void bindDualCheckBox(CompoundButton main, CompoundButton floating,
+                                  CompoundButton.OnCheckedChangeListener onChanged) {
+        main.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (floating.isChecked() != isChecked) {
+                floating.setChecked(isChecked);
                 return;
             }
-            onBrushCheckImpl(isChecked);
+            onChanged.onCheckedChanged(buttonView, isChecked);
         });
-        binding.floatMenuContainer.floatEraseCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.eraseCheck.isChecked() != isChecked) {
-                binding.eraseCheck.setChecked(isChecked);
+        floating.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (main.isChecked() != isChecked) {
+                main.setChecked(isChecked);
                 return;
             }
-            onEraseCheckImpl(isChecked);
-        });
-        binding.floatMenuContainer.floatDisplayEraseTrackCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.displayEraseTrackCheck.isChecked() != isChecked) {
-                binding.displayEraseTrackCheck.setChecked(isChecked);
-                return;
-            }
-            onDisplayEraseTrackCheckImpl(isChecked);
-        });
-        binding.floatMenuContainer.floatPenUpCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (binding.penUpCheck.isChecked() != isChecked) {
-                binding.penUpCheck.setChecked(isChecked);
-                return;
-            }
-            onPenUpCheckImpl(isChecked);
+            onChanged.onCheckedChanged(buttonView, isChecked);
         });
     }
 
-    private void onPenUpCheckImpl(boolean isChecked) {
-        getPenBundle().setEnablePenUpRefresh(isChecked);
-        refreshScreen();
+    private void onPenUpCheckImpl(CompoundButton buttonView, boolean isChecked) {
+        penSession.setPenUpRefreshEnabled(isChecked);
     }
 
-    private void onDisplayEraseTrackCheckImpl(boolean isChecked) {
-        getPenBundle().setDisplayEraseTrack(isChecked);
-        refreshScreen();
-    }
-
-    private void onEraseCheckImpl(boolean isChecked) {
-        getPenBundle().setErasing(isChecked);
-        refreshScreen();
+    private void onEraseCheckImpl(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             binding.brushCheck.setChecked(false);
-            binding.floatMenuContainer.floatBrushCheck.setChecked(false);
+            penSession.setTool(PenTool.fromEraseType(penSession.getPenBundle().getCurrentEraseType()));
         }
     }
 
-    private void onBrushCheckImpl(boolean isChecked) {
-        getPenBundle().setErasing(!isChecked);
-        refreshScreen();
+    private void onBrushCheckImpl(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             binding.eraseCheck.setChecked(false);
-            binding.floatMenuContainer.floatEraseCheck.setChecked(false);
+            penSession.setTool(PenTool.BRUSH);
         }
+    }
+
+    private void syncUiFromBundle() {
+        PenTool tool = penSession.getCurrentTool();
+        boolean erasing = tool.isErase();
+        binding.brushCheck.setChecked(!erasing);
+        binding.eraseCheck.setChecked(erasing);
+        binding.penUpCheck.setChecked(penSession.getPenBundle().isEnablePenUpRefresh());
+        binding.floatMenuContainer.floatBrushCheck.setChecked(!erasing);
+        binding.floatMenuContainer.floatEraseCheck.setChecked(erasing);
+        binding.floatMenuContainer.floatPenUpCheck.setChecked(
+                penSession.getPenBundle().isEnablePenUpRefresh());
     }
 
     private void onBrushButtonClickImpl(View view) {
         binding.brushCheck.setChecked(true);
-        binding.floatMenuContainer.floatBrushCheck.setChecked(true);
         PenSettingPop penSettingPop = new PenSettingPop(view.getContext());
         showPenSettingPop(view, penSettingPop);
+    }
+
+    private void onEraseButtonClickImpl(View view) {
+        binding.eraseCheck.setChecked(true);
+        EraseSettingPop eraseSettingPop = new EraseSettingPop(view.getContext())
+                .setPenSession(penSession);
+        showEraseSettingPop(view, eraseSettingPop);
+    }
+
+    private void showEraseSettingPop(View view, EraseSettingPop eraseSettingPop) {
+        if (view.getId() == R.id.erase_button) {
+            int[] location = new int[2];
+            view.getLocationOnScreen(location);
+            int x = location[0] + view.getWidth();
+            eraseSettingPop.showAsDropDown(view, x, 0, Gravity.NO_GRAVITY);
+        } else if (view.getId() == R.id.float_erase_button) {
+            eraseSettingPop.showAsDropDown(view, 0, 0, Gravity.NO_GRAVITY);
+        }
     }
 
     private void showPenSettingPop(View view, PenSettingPop penSettingPop) {
@@ -277,230 +185,6 @@ public class PenDemoActivity extends Activity {
         }
     }
 
-    private void subscribeSurfaceChanged() {
-        surfaceChangedFilter.dispose();
-        surfaceChangedFilter.subscribeThrottleLast(300, aBoolean -> {
-            renderToSurfaceView();
-        });
-    }
-
-    private void renderToSurfaceView() {
-        Log.e(TAG, "renderToSurfaceView");
-        getRxManager().enqueue(new AttachNoteViewRequest(getPenManager())
-                        .setHostView(getSurfaceView())
-                        .setFloatMenuLayout(getFloatMenuLayout())
-                        .setCallback(getRawInputCallback()),
-                new RxCallback<AttachNoteViewRequest>() {
-                    @Override
-                    public void onNext(@NonNull AttachNoteViewRequest request) {
-                        refreshScreen();
-
-                        dragHandler = new FloatingMenuDragHandler(getFloatMenuLayout())
-                                .setLimitRect(getPenManager().getLimitNoteRect());
-                        getFloatMenuLayout().setOnTouchListener(dragHandler);
-                    }
-                });
-    }
-
-    private RawInputCallback getRawInputCallback() {
-        if (rawInputCallback == null) {
-            rawInputCallback = new RawInputCallback() {
-                private ObservableHolder<TouchPoint> eraseObservable;
-
-                @Override
-                public void onBeginRawDrawing(boolean b, TouchPoint touchPoint) {
-                    if (getPenBundle().isErasing()) {
-                        onBeginRawErasing(false, touchPoint);
-                        return;
-                    }
-                    Log.d(TAG, "onBeginRawDrawing");
-                }
-
-                @Override
-                public void onEndRawDrawing(boolean b, TouchPoint touchPoint) {
-                    if (getPenBundle().isErasing()) {
-                        onEndRawErasing(b, touchPoint);
-                        return;
-                    }
-                    Log.d(TAG, "onEndRawDrawing###");
-                }
-
-                @Override
-                public void onRawDrawingTouchPointMoveReceived(TouchPoint touchPoint) {
-                    if (getPenBundle().isErasing()) {
-                        onRawErasingTouchPointMoveReceived(touchPoint);
-                        return;
-                    }
-                    Log.d(TAG, "onRawDrawingTouchPointMoveReceived");
-                }
-
-                @Override
-                public void onRawDrawingTouchPointListReceived(TouchPointList touchPointList) {
-                    if (getPenBundle().isErasing()) {
-                        onRawErasingTouchPointListReceived(touchPointList);
-                        return;
-                    }
-                    if (floatButtonActivated || demoFloatMenuActivated) {
-                        Log.d(TAG, "FloatButton or demoFloatMenu activated, return");
-                        return;
-                    }
-                    Log.d(TAG, "onRawDrawingTouchPointListReceived");
-                    addShape(touchPointList);
-                }
-
-                @Override
-                public void onBeginRawErasing(boolean b, TouchPoint point) {
-                    Log.d(TAG, "onBeginRawErasing");
-                    onBeginRawErasingImpl(point);
-                }
-
-                @Override
-                public void onEndRawErasing(boolean b, TouchPoint point) {
-                    Log.d(TAG, "onEndRawErasing");
-                }
-
-                @Override
-                public void onRawErasingTouchPointMoveReceived(TouchPoint point) {
-                    Log.d(TAG, "onRawErasingTouchPointMoveReceived");
-                    onRawErasingPointMoveImpl(point);
-                }
-
-                @Override
-                public void onRawErasingTouchPointListReceived(TouchPointList pointList) {
-                    Log.d(TAG, "onRawErasingTouchPointListReceived");
-                    onRawErasingPointsReceivedImpl(pointList);
-                }
-
-                @Override
-                public void onPenUpRefresh(RectF refreshRect) {
-                    if (!getPenBundle().isEnablePenUpRefresh()) {
-                        return;
-                    }
-                    PartialRefreshRequest request = new PartialRefreshRequest(getPenManager(), refreshRect);
-                    new CommonPenAction<>(request).execute();
-                }
-
-                private void removeEraseObserver() {
-                    if (eraseObservable != null) {
-                        eraseObservable.dispose();
-                    }
-                    eraseObservable = null;
-                }
-
-                private void onBeginRawErasingImpl(TouchPoint point) {
-                    removeEraseObserver();
-                    eraseObservable = new ObservableHolder<>();
-                    eraseObservable.setDisposable(eraseObservable.getObservable().buffer(50, TimeUnit.MILLISECONDS)
-                            .subscribe(touchPoints -> {
-                                if (eraseObservable == null) {
-                                    return;
-                                }
-                                TouchPointList pointList = new TouchPointList();
-                                for (TouchPoint touchPoint : touchPoints) {
-                                    TouchPoint erasePoint = new TouchPoint(touchPoint);
-                                    // getEraseContext().addErasePoint(erasePoint);
-                                    pointList.add(erasePoint);
-                                }
-                                erasing(pointList);
-                            }));
-                    eraseObservable.onNext(point);
-                }
-
-                private void onRawErasingPointMoveImpl(TouchPoint point) {
-                    if (eraseObservable != null) {
-                        eraseObservable.onNext(point);
-                    }
-                }
-
-                private void onRawErasingPointsReceivedImpl(TouchPointList pointList) {
-                    removeEraseObserver();
-                    endErasing(pointList);
-                }
-
-                private void endErasing(TouchPointList pointList) {
-                    getRxManager().enqueue(new StrokesEraseFinishedRequest(getPenManager()),
-                            new RxCallback<StrokesEraseFinishedRequest>() {
-                                @Override
-                                public void onNext(@NonNull StrokesEraseFinishedRequest request) {
-                                    refreshScreen();
-                                }
-                            });
-                }
-
-                private void erasing(TouchPointList pointList) {
-                    float drawRadius = getPenBundle().getCurrentEraseWidth() / 2;
-                    EraseArgs eraseArgs = new EraseArgs()
-                            .setEraserWidth(getPenBundle().getCurrentEraseWidth())
-                            .setEraserType(ShapeFactory.ERASER_STROKE)
-                            .setEraseTrackPoints(pointList)
-                            .setDrawRadius(drawRadius)
-                            .setShowEraseCircle(getPenBundle().isDisplayEraseTrack());
-                    StrokeErasingRequest request = new StrokeErasingRequest(getPenManager(), eraseArgs);
-                    new CommonPenAction<>(request).execute();
-                }
-
-            };
-        }
-        return rawInputCallback;
-    }
-
-    private void addShape(TouchPointList touchPointList) {
-        int currentShapeType = getPenBundle().getCurrentShapeType();
-        Shape shape = ShapeUtils.createShape(getPenBundle(), currentShapeType, touchPointList);
-        BaseRequest request = new AddShapeRequest(getPenManager())
-                .setShape(shape)
-                .setPauseRawDraw(false)
-                .setRenderToScreen(false);
-        new CommonPenAction<>(request).execute();
-    }
-
-    private void pauseRawDrawing() {
-        pauseRawDrawingRender();
-        pauseRawInputReader();
-    }
-
-    private void pauseRawDrawingRender() {
-        PauseRawDrawingRenderRequest request = new PauseRawDrawingRenderRequest(getPenManager());
-        new CommonPenAction<>(request).execute();
-    }
-
-    private void pauseRawInputReader() {
-        PauseRawInputRenderRequest request = new PauseRawInputRenderRequest(getPenManager());
-        new CommonPenAction<>(request).execute();
-    }
-
-    private void resumeRawDrawing(boolean resumeRender, boolean resumeInput, int delayResumePenTime) {
-        final boolean render = resumeRender
-                && !getPenBundle().isErasing()
-                && hasFocus
-                && !statusBarShowing
-                && !NotificationPanelShowing
-                && !floatButtonActivated
-                && !demoFloatMenuActivated;
-        final boolean input = resumeInput
-                && hasFocus
-                && !statusBarShowing
-                && !NotificationPanelShowing
-                && !floatButtonActivated
-                && !demoFloatMenuActivated;
-        if (!render && !input) {
-            return;
-        }
-        resumeRawDrawingImpl(render, input, delayResumePenTime);
-    }
-
-    private void resumeRawDrawingImpl(boolean resumeRender, boolean resumeInput, int delayResumePenTime) {
-        ResumeRawDrawingRequest request = new ResumeRawDrawingRequest(getPenManager())
-                .setResumeRawDrawingRender(resumeRender)
-                .setResumeRawInputReader(resumeInput)
-                .setDelayResumePenTimeMs(delayResumePenTime);
-        new CommonPenAction<>(request).execute();
-    }
-
-    private void refreshScreen() {
-        new RefreshScreenAction().execute();
-    }
-
     private void applyApplicationFastMode(boolean enable) {
         if (enable) {
             EpdController.applyTransientUpdate(UpdateMode.ANIMATION_X);
@@ -510,77 +194,15 @@ public class PenDemoActivity extends Activity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNotificationPanelChangeEvent(NotificationPanelChangeEvent event) {
-        NotificationPanelShowing = event.show;
-        refreshScreen();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onStatusBarChangeEvent(StatusBarChangeEvent event) {
-        statusBarShowing = event.show;
-        refreshScreen();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onActivityFocusChangedEvent(ActivityFocusChangedEvent event) {
-        hasFocus = event.hasFocus;
-        refreshScreen();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFloatButtonChangedEvent(FloatButtonChangedEvent event) {
-        floatButtonActivated = event.active;
-        refreshScreen();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFloatButtonMenuStateChangedEvent(FloatButtonMenuStateChangedEvent event) {
-        floatButtonActivated = event.active;
-        refreshScreen();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onDemoFloatMenuStateChangeEvent(DemoFloatMenuStateChangeEvent event) {
-        demoFloatMenuActivated = event.active;
-        refreshScreen();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onApplyFastModeEvent(ApplyFastModeEvent event) {
         applyApplicationFastMode(event.enable);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onPenEvent(PenEvent event) {
-        resumeRawDrawing(event.isResumeDrawingRender(), event.isResumeRawInputReader(), event.getDelayResumePenTimeMs());
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onPopupWindowChangeEvent(PopupWindowChangeEvent event) {
-        if (event.show) {
-            pauseRawDrawing();
-        } else {
-            resumeRawDrawing(true, true, PenEvent.POPUP_RESUME_PEN_TIME_MS);
-        }
     }
 
     private SurfaceView getSurfaceView() {
         return binding.surfaceView;
     }
 
-    private PenBundle getPenBundle() {
-        return PenBundle.getInstance();
-    }
-
     public PenManager getPenManager() {
-        return getPenBundle().getPenManager();
+        return penSession.getPenManager();
     }
-
-    private RxManager getRxManager() {
-        if (rxManager == null) {
-            rxManager = RxManager.Builder.sharedSingleThreadManager();
-        }
-        return rxManager;
-    }
-
 }

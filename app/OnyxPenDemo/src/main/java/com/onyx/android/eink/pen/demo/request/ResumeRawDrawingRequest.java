@@ -1,8 +1,7 @@
 package com.onyx.android.eink.pen.demo.request;
 
-import com.onyx.android.eink.pen.demo.PenBundle;
-import com.onyx.android.eink.pen.demo.PenManager;
-import com.onyx.android.eink.pen.demo.data.ShapeFactory;
+import com.onyx.android.eink.pen.demo.core.PenBundle;
+import com.onyx.android.eink.pen.demo.core.PenManager;
 import com.onyx.android.sdk.rx.RxRequest;
 import com.onyx.android.sdk.utils.ThreadUtils;
 
@@ -40,42 +39,22 @@ public class ResumeRawDrawingRequest extends RxRequest {
         if (!resumeRawDrawingRender && !resumeRawInputReader) {
             return;
         }
-        if (!canResumeRawDrawingRender() && !canResumeRawInputReader()) {
-            return;
-        }
         ThreadUtils.mySleep(delayResumePenTimeMs);
-        updatePenParam();
-        updateDrawExcludeRect();
-        if (canResumeRawDrawingRender()) {
-            penManager.setRawDrawingRenderEnabled(true);
+        PenBundle penBundle = PenBundle.getInstance();
+        if (!penManager.getTouchHelper().isRawDrawingCreated()) {
+            penManager.restartRawPenSession(penBundle);
+        } else {
+            penManager.restoreRawPenInput(penBundle);
         }
-        if (canResumeRawInputReader()) {
+        penManager.setPenUpRefreshTimeMs(penBundle.getPenUpRefreshTimeMs());
+        penManager.setDrawExcludeRect(penBundle.getExcludeRectList());
+        if (resumeRawInputReader) {
             penManager.setRawInputReaderEnable(true);
         }
+        if (resumeRawDrawingRender) {
+            penManager.setRawDrawingRenderEnabled(true);
+        } else if (resumeRawInputReader) {
+            penManager.setRawDrawingRenderEnabled(false);
+        }
     }
-
-    private void updatePenParam() {
-        penManager.setStrokeWidth(getPenBundle().getCurrentStrokeWidth());
-        penManager.setStrokeStyle(ShapeFactory.getStrokeStyle(
-                        getPenBundle().getCurrentShapeType(), getPenBundle().getCurrentTexture()));
-        penManager.setStrokeColor(getPenBundle().getCurrentStrokeColor());
-        penManager.setPenUpRefreshTimeMs(getPenBundle().getPenUpRefreshTimeMs());
-    }
-
-    private void updateDrawExcludeRect() {
-        penManager.setDrawExcludeRect(getPenBundle().getExcludeRectList());
-    }
-
-    private boolean canResumeRawDrawingRender() {
-        return resumeRawDrawingRender && !penManager.isRawDrawingRenderEnabled();
-    }
-
-    private boolean canResumeRawInputReader() {
-        return resumeRawInputReader && !penManager.isRawDrawingInputEnabled();
-    }
-
-    private PenBundle getPenBundle() {
-        return PenBundle.getInstance();
-    }
-
 }

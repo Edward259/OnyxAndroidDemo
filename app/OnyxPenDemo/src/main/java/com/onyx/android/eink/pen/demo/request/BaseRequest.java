@@ -2,7 +2,7 @@ package com.onyx.android.eink.pen.demo.request;
 
 import androidx.annotation.NonNull;
 
-import com.onyx.android.eink.pen.demo.PenManager;
+import com.onyx.android.eink.pen.demo.core.PenManager;
 import com.onyx.android.sdk.rx.RxRequest;
 
 public abstract class BaseRequest extends RxRequest {

@@ -1,7 +1,7 @@
 package com.onyx.android.eink.pen.demo.action;
 
-import com.onyx.android.eink.pen.demo.PenBundle;
-import com.onyx.android.eink.pen.demo.PenManager;
+import com.onyx.android.eink.pen.demo.core.PenBundle;
+import com.onyx.android.eink.pen.demo.core.PenManager;
 import com.onyx.android.sdk.rx.RxBaseAction;
 import com.onyx.android.sdk.rx.RxRequest;
 import com.onyx.android.sdk.utils.ResManager;

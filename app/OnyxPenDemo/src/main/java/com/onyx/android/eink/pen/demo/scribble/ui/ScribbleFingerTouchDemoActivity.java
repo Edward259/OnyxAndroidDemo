@@ -19,7 +19,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.onyx.android.eink.pen.demo.R;
 import com.onyx.android.eink.pen.demo.databinding.ActivityFingerTouchHelperDemoBinding;
-import com.onyx.android.eink.pen.demo.scribble.broadcast.GlobalDeviceReceiver;
+import com.onyx.android.eink.pen.demo.receiver.GlobalDeviceReceiver;
 import com.onyx.android.eink.pen.demo.scribble.request.RendererToScreenRequest;
 import com.onyx.android.eink.pen.demo.scribble.util.TouchUtils;
 import com.onyx.android.sdk.api.device.epd.EpdController;

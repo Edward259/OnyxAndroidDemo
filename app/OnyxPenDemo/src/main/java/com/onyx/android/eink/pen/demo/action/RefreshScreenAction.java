@@ -1,55 +1,56 @@
 package com.onyx.android.eink.pen.demo.action;
 
-import com.onyx.android.eink.pen.demo.PenBundle;
-import com.onyx.android.eink.pen.demo.PenManager;
+import com.onyx.android.eink.pen.demo.core.PenBundle;
+import com.onyx.android.eink.pen.demo.core.PenManager;
+import com.onyx.android.eink.pen.demo.data.RawPenArgs;
 import com.onyx.android.eink.pen.demo.event.PenEvent;
-import com.onyx.android.eink.pen.demo.request.RendererToScreenRequest;
 import com.onyx.android.sdk.rx.RxBaseAction;
-import com.onyx.android.sdk.utils.EventBusUtils;
 
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
+/** Full-screen refresh with configurable {@link RawPenArgs} pause/resume around the invalidate. */
 public class RefreshScreenAction extends RxBaseAction<RefreshScreenAction> {
-    private volatile boolean pauseRawInputReader = true;
-    private volatile boolean resumeRawDrawing = true;
-    private int delayResumePenTimeMs = PenEvent.DELAY_ENABLE_RAW_DRAWING_MILLS;
+
+    private final RawPenArgs rawPenArgs = RawPenArgs.pauseResumeArgs();
     private int delayRefreshTime;
 
     public RefreshScreenAction() {
+        rawPenArgs.setResumeDelayTime(PenEvent.DELAY_ENABLE_RAW_DRAWING_MILLS);
+    }
+
+    @Override
+    protected Observable<RefreshScreenAction> create() {
+        return getDelayObservable()
+                .flatMap(o -> new InvalidateViewWithPenControlAction(rawPenArgs).build()
+                        .map(action -> this));
+    }
+
+    public RefreshScreenAction setResumeRawDrawing(boolean resumeRawDrawing) {
+        rawPenArgs.setResumeRawDrawingRender(resumeRawDrawing);
+        rawPenArgs.setResumeRawInputReader(resumeRawDrawing);
+        return this;
+    }
+
+    public RefreshScreenAction setPauseRawInputReader(boolean pause) {
+        rawPenArgs.setPauseRawInputReader(pause);
+        return this;
+    }
+
+    public RefreshScreenAction setPauseRawDrawingRender(boolean pause) {
+        rawPenArgs.setPauseRawDrawingRender(pause);
+        return this;
     }
 
     public RefreshScreenAction setDelayResumePenTimeMs(int delayResumePenTimeMs) {
-        this.delayResumePenTimeMs = delayResumePenTimeMs;
+        rawPenArgs.setResumeDelayTime(delayResumePenTimeMs);
         return this;
     }
 
     public RefreshScreenAction setDelayRefreshTime(int delayRefreshTime) {
         this.delayRefreshTime = delayRefreshTime;
-        return this;
-    }
-
-    @Override
-    protected Observable<RefreshScreenAction> create() {
-        return getPenManager().createObservable()
-                .flatMap(o -> getDelayObservable())
-                .map(o -> refresh());
-    }
-
-    public RefreshScreenAction setResumeRawDrawing(boolean resumeRawDrawing) {
-        this.resumeRawDrawing = resumeRawDrawing;
-        return this;
-    }
-
-    private RefreshScreenAction refresh() throws Exception {
-        new RendererToScreenRequest(getPenManager())
-                .setPauseRawInputReader(pauseRawInputReader)
-                .execute();
-        if (resumeRawDrawing) {
-            EventBusUtils.safelyPostEvent(getPenManager().getEventBus(), PenEvent.resumeRawDrawing(delayResumePenTimeMs));
-        }
         return this;
     }
 
@@ -74,5 +75,4 @@ public class RefreshScreenAction extends RxBaseAction<RefreshScreenAction> {
     public Scheduler getScheduler() {
         return getPenManager().getObserveOn();
     }
-
 }

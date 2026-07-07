@@ -45,7 +45,6 @@ The SDK also provides additional functionality such as a move eraser, inking on 
 
 * [ScribbleMultipleScribbleViewActivity](app/src/main/java/com/android/onyx/demo/scribble/ScribbleMultipleScribbleViewActivity.java): inking with multiple views
 
-
 ## 4. Screensaver
 
 * [ScreensaverActivity](app/src/main/java/com/android/onyx/demo/ScreensaverActivity.java): setting a screensaver
@@ -64,6 +63,13 @@ The SDK also provides additional functionality such as a move eraser, inking on 
 ## 8. 墨水屏开发指南
 
 * [墨水屏开发指南](doc/Eink-Develop-Guide_zh.md): 墨水屏开发指南文档
+
+## 9. OnyxPenDemo
+
+独立手写/擦除示例模块（`app/OnyxPenDemo`），基于 `PenSession` 封装完整笔迹链路。
+
+* [PenDemoActivity 构建指南](doc/PenDemoActivity-Build-Guide_zh.md): Activity 接入手写（`PenSession` 集成说明）
+* [OnyxPenDemo 使用指南](OnyxPenDemo使用指南.md): 手写、擦除与数据生命周期说明（面向使用者）
 
 ## PRs Welcome
 

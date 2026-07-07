@@ -6,7 +6,7 @@ import android.util.Size;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.onyx.android.eink.pen.demo.PenBundle;
+import com.onyx.android.eink.pen.demo.core.PenBundle;
 import com.onyx.android.eink.pen.demo.event.ApplyFastModeEvent;
 import com.onyx.android.eink.pen.demo.event.DemoFloatMenuStateChangeEvent;
 import com.onyx.android.sdk.data.note.TouchPoint;

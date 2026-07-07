@@ -4,8 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.view.SurfaceView;
 
-import com.onyx.android.eink.pen.demo.helper.RendererHelper;
-import com.onyx.android.eink.pen.demo.util.RendererUtils;
+import com.onyx.android.eink.pen.demo.brush.render.BaseRenderer;
 import com.onyx.android.sdk.utils.CanvasUtils;
 import com.onyx.android.sdk.utils.RectUtils;
 
