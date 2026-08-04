@@ -18,6 +18,7 @@ import com.onyx.android.eink.pen.demo.erase.data.EraseTypes;
 import com.onyx.android.eink.pen.demo.erase.util.EraserTrackHelper;
 import com.onyx.android.eink.pen.demo.helper.RendererHelper;
 import com.onyx.android.eink.pen.demo.shape.Shape;
+import com.onyx.android.eink.pen.demo.util.PenInfoUtils;
 import com.onyx.android.sdk.api.device.epd.EpdController;
 import com.onyx.android.sdk.api.device.epd.UpdateMode;
 import com.onyx.android.sdk.data.PenConstant;
@@ -499,12 +500,23 @@ public class PenManager {
 
     private void applyBrushTouchHelperParams(PenBundle penBundle) {
         setBrushRawDrawingEnabled(true);
-        setStrokeStyle(ShapeFactory.getStrokeStyle(
-                penBundle.getCurrentShapeType(), penBundle.getCurrentTexture()));
+        int shapeType = penBundle.getCurrentShapeType();
+        int strokeStyle = ShapeFactory.getStrokeStyle(shapeType, penBundle.getCurrentTexture());
+        setStrokeStyle(strokeStyle);
         setStrokeWidth(penBundle.getCurrentStrokeWidth());
         setStrokeColor(penBundle.getCurrentStrokeColor());
+        applyStrokeParameters(shapeType, strokeStyle);
         setRawDrawingRenderEnabled(true);
         setRawInputReaderEnable(true);
+    }
+
+    public void applyStrokeParameters(int shapeType, int strokeStyle) {
+        float[] merged = PenInfoUtils.mergeStrokeParameters(
+                shapeType, Device.currentDevice().getStrokeParameters(strokeStyle));
+        if (merged == null) {
+            return;
+        }
+        Device.currentDevice().setStrokeParameters(strokeStyle, merged);
     }
 
     private void applyCapEraseStrokeConfig(PenBundle penBundle) {
